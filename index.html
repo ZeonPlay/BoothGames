@@ -31,13 +31,17 @@
                 background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 50%, #40916c 100%);
                 min-height: 100vh;
                 overflow-x: hidden;
+                overflow-y: auto;
                 color: #fff;
             }
             .screen {
                 display: none;
                 min-height: 100vh;
+                height: auto !important;
                 padding: 20px;
                 animation: fadeIn 0.5s ease;
+                overflow-y: auto !important;
+                overflow-x: hidden;
             }
             .screen.active {
                 display: flex;
@@ -534,11 +538,21 @@
                 transform: rotateY(180deg);
             }
             .memory-card.matched {
-                animation: bounce 0.4s;
-                opacity: 0.8;
+                transform: rotateY(180deg) !important;
+                opacity: 1 !important;
+                pointer-events: none;
             }
             .memory-card.matched {
                 pointer-events: none;
+            }
+            .memory-card.matched .memory-card-back {
+                background: rgba(149, 213, 178, 0.25);
+                border: 2px solid #95d5b2;
+                box-shadow: 0 0 18px rgba(149, 213, 178, 0.45);
+            }
+
+            .memory-card.matched .memory-card-front {
+                display: none;
             }
             .memory-card-front,
             .memory-card-back {
@@ -906,6 +920,107 @@
                     font-size: 1.1rem;
                 }
             }
+            /* FOOTER */
+
+            .zeon-footer {
+                width: 100%;
+
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                padding: 30px 20px calc(30px + env(safe-area-inset-bottom));
+
+                margin-top: 40px;
+            }
+
+            .zeon-card {
+                width: min(430px, 100%);
+
+                display: flex;
+                align-items: center;
+                gap: 18px;
+
+                padding: 16px;
+
+                border-radius: 24px;
+
+                text-decoration: none;
+
+                background: rgba(255, 255, 255, 0.06);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+
+                backdrop-filter: blur(12px);
+
+                transition:
+                    transform 0.25s ease,
+                    background 0.25s ease,
+                    border-color 0.25s ease;
+            }
+
+            .zeon-card:hover {
+                transform: translateY(-4px);
+
+                background: rgba(255, 255, 255, 0.09);
+                border-color: rgba(255, 255, 255, 0.16);
+            }
+
+            .zeon-gif-wrap {
+                width: 92px;
+                height: 92px;
+
+                overflow: hidden;
+                flex-shrink: 0;
+
+                border-radius: 18px;
+
+                background: rgba(255, 255, 255, 0.04);
+            }
+
+            .zeon-gif {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+
+                display: block;
+            }
+
+            .zeon-info h3 {
+                margin: 0;
+
+                color: white;
+                font-size: 1.2rem;
+                font-weight: 700;
+            }
+
+            .zeon-info p {
+                margin-top: 6px;
+
+                color: rgba(255, 255, 255, 0.7);
+                font-size: 0.95rem;
+            }
+            @media (max-width: 768px) {
+                .zeon-card {
+                    width: 100%;
+                    max-width: 100%;
+
+                    padding: 14px;
+                    border-radius: 20px;
+                }
+
+                .zeon-gif-wrap {
+                    width: 74px;
+                    height: 74px;
+                }
+
+                .zeon-info h3 {
+                    font-size: 1rem;
+                }
+
+                .zeon-info p {
+                    font-size: 0.82rem;
+                }
+            }
         </style>
     </head>
     <body>
@@ -952,6 +1067,20 @@
                     <span class="game-card-diff diff-hard">Sulit</span>
                 </div>
             </div>
+
+            <footer class="zeon-footer">
+                <a href="https://wa.me/6281278376003" target="_blank" class="zeon-card">
+                    <div class="zeon-gif-wrap">
+                        <!-- GANTI DENGAN FILE GIF KAMU -->
+                        <img src="./videos/rikka.gif" alt="Zeon" class="zeon-gif" />
+                    </div>
+
+                    <div class="zeon-info">
+                        <h3>Zeon</h3>
+                        <p>Click to contact via WhatsApp</p>
+                    </div>
+                </a>
+            </footer>
         </div>
 
         <!-- GAME 1: FOOD SORTER -->
@@ -1233,6 +1362,7 @@
             ];
 
             function startGame(type) {
+                clearAllTimers();
                 currentGame = type;
                 gameData = {};
                 switch (type) {
@@ -1260,6 +1390,7 @@
                 gameData.score = 0;
                 gameData.combo = 0;
                 gameData.maxCombo = 0;
+                gameData.sortLocked = false;
                 showScreen("sorterScreen");
                 renderSorterItem();
             }
@@ -1277,15 +1408,20 @@
                 const item = gameData.items[gameData.index];
                 $("sorterEmoji").textContent = item.emoji;
                 $("sorterFoodName").textContent = item.name;
+                $("sorterHint").textContent = item.fact;
                 $("sorterScore").textContent = gameData.score;
                 $("sorterCombo").textContent = gameData.combo;
                 $("sorterProgress").textContent = `${gameData.index + 1}/${gameData.items.length}`;
                 $("sorterResult").textContent = "";
                 $("sorterResult").className = "sort-result";
                 $("sorterComboText").textContent = gameData.combo >= 3 ? `🔥 ${gameData.combo}x COMBO!` : "";
+                gameData.sortLocked = false;
             }
 
             function sortAnswer(cat) {
+                if (gameData.sortLocked) return;
+                gameData.sortLocked = true;
+
                 const item = gameData.items[gameData.index];
                 const isCorrect = item.cat === cat;
                 const result = $("sorterResult");
@@ -1303,8 +1439,15 @@
                     result.textContent = `❌ Salah! Jawaban: ${catNames[item.cat]}. ${item.fact}`;
                     result.className = "sort-result wrong";
                 }
-                gameData.index++;
-                renderSorterItem();
+
+                $("sorterScore").textContent = gameData.score;
+                $("sorterCombo").textContent = gameData.combo;
+                $("sorterComboText").textContent = gameData.combo >= 3 ? `🔥 ${gameData.combo}x COMBO!` : "";
+
+                gameData.timeout = setTimeout(() => {
+                    gameData.index++;
+                    renderSorterItem();
+                }, 1100);
             }
 
             // ============ GAME 2: QUIZ ============
@@ -1511,53 +1654,82 @@
                 });
             }
 
+            // GANTI function flipCard(idx) YANG LAMA DENGAN INI
+
             function flipCard(idx) {
                 if (gameData.locked) return;
+
                 const card = gameData.cards[idx];
                 if (card.matched) return;
-                const el = document.querySelectorAll(".memory-card")[idx];
+
+                const elements = document.querySelectorAll(".memory-card");
+                const el = elements[idx];
+
                 if (el.classList.contains("flipped")) return;
 
                 el.classList.add("flipped");
                 gameData.flipped.push(idx);
 
-                if (gameData.flipped.length === 2) {
-                    gameData.moves++;
-                    $("memoryMoves").textContent = gameData.moves;
-                    gameData.locked = true;
-                    const [a, b] = gameData.flipped;
+                if (gameData.flipped.length < 2) return;
 
-                    if (gameData.cards[a].pairId === gameData.cards[b].pairId) {
-                        gameData.cards[a].matched = true;
-                        gameData.cards[b].matched = true;
-                        document.querySelectorAll(".memory-card")[a].classList.add("matched");
-                        document.querySelectorAll(".memory-card")[b].classList.add("matched");
-                        gameData.matched++;
-                        $("memoryPairs").textContent = `${gameData.matched}/${memoryPairs.length}`;
-                        gameData.flipped = [];
-                        gameData.locked = false;
+                gameData.moves++;
+                $("memoryMoves").textContent = gameData.moves;
 
-                        if (gameData.matched === memoryPairs.length) {
-                            clearInterval(gameData.interval);
-                            gameData.timeout = setTimeout(() => {
-                                const score = Math.max(100 - gameData.moves * 2, 20);
-                                showResult(
-                                    "memory",
-                                    score,
-                                    100,
-                                    `Selesai dalam ${gameData.moves} langkah dan ${Math.floor(gameData.seconds / 60)}:${(gameData.seconds % 60).toString().padStart(2, "0")} menit!`,
-                                );
-                            }, 800);
-                        }
-                    } else {
+                gameData.locked = true;
+
+                const [a, b] = gameData.flipped;
+                const firstCard = gameData.cards[a];
+                const secondCard = gameData.cards[b];
+
+                const firstEl = elements[a];
+                const secondEl = elements[b];
+
+                // MATCH
+                // LALU GANTI BAGIAN MATCH DI function flipCard()
+
+                if (firstCard.pairId === secondCard.pairId) {
+                    firstCard.matched = true;
+                    secondCard.matched = true;
+
+                    firstEl.classList.add("flipped", "matched");
+                    secondEl.classList.add("flipped", "matched");
+
+                    gameData.matched++;
+
+                    $("memoryPairs").textContent = `${gameData.matched}/${memoryPairs.length}`;
+
+                    gameData.flipped = [];
+                    gameData.locked = false;
+
+                    if (gameData.matched === memoryPairs.length) {
+                        clearInterval(gameData.interval);
+
                         gameData.timeout = setTimeout(() => {
-                            document.querySelectorAll(".memory-card")[a].classList.remove("flipped");
-                            document.querySelectorAll(".memory-card")[b].classList.remove("flipped");
-                            gameData.flipped = [];
-                            gameData.locked = false;
+                            const score = Math.max(100 - gameData.moves * 2, 20);
+
+                            showResult(
+                                "memory",
+                                score,
+                                100,
+                                `Selesai dalam ${gameData.moves} langkah dan ${Math.floor(gameData.seconds / 60)}:${(
+                                    gameData.seconds % 60
+                                )
+                                    .toString()
+                                    .padStart(2, "0")} menit!`,
+                            );
                         }, 800);
                     }
+
+                    return;
                 }
+                // SALAH
+                gameData.timeout = setTimeout(() => {
+                    firstEl.classList.remove("flipped");
+                    secondEl.classList.remove("flipped");
+
+                    gameData.flipped = [];
+                    gameData.locked = false;
+                }, 800);
             }
 
             // ============ GAME 4: TAP CORRECT ============
@@ -1602,7 +1774,12 @@
                 gameData.roundItems = [];
                 gameData.itemsNeeded = 0;
                 gameData.itemsTapped = 0;
+                gameData.tapLocked = false;
                 showScreen("tapScreen");
+                $("tapScore").textContent = "0";
+                $("tapLives").textContent = "❤️".repeat(gameData.lives);
+                $("tapTimer").textContent = gameData.timeLeft;
+                $("tapTimerBar").style.width = "100%";
                 renderTapRound();
                 gameData.interval = setInterval(() => {
                     gameData.timeLeft--;
@@ -1640,13 +1817,16 @@
                 gameData.roundItems = [];
                 gameData.itemsTapped = 0;
                 gameData.itemsNeeded = r.needed;
+                gameData.tapLocked = false;
 
-                const allItems = shuffle([...r.correct, ...r.wrong]).slice(0, 9);
+                const poolCorrect = shuffle([...r.correct]);
+                const poolWrong = shuffle([...r.wrong]);
+                const allItems = shuffle([...poolCorrect.slice(0, r.needed), ...poolWrong.slice(0, 9 - r.needed)]);
                 gameData.roundItems = allItems;
 
                 const grid = $("tapGrid");
                 grid.innerHTML = "";
-                allItems.forEach((emoji, i) => {
+                allItems.forEach(emoji => {
                     const item = document.createElement("div");
                     item.className = "tap-item";
                     item.innerHTML = `<div class="emoji">${emoji}</div>`;
@@ -1656,23 +1836,25 @@
             }
 
             function tapItem(emoji, el, isCorrect) {
-                if (el.classList.contains("disabled")) return;
+                if (gameData.tapLocked || el.classList.contains("disabled")) return;
                 if (isCorrect) {
                     el.classList.add("correct-tap", "disabled");
                     gameData.itemsTapped++;
                     gameData.score++;
                     $("tapScore").textContent = gameData.score;
                     if (gameData.itemsTapped >= gameData.itemsNeeded) {
+                        gameData.tapLocked = true;
                         gameData.timeout = setTimeout(() => {
                             gameData.round++;
                             renderTapRound();
                         }, 600);
                     }
                 } else {
-                    el.classList.add("wrong-tap");
+                    el.classList.add("wrong-tap", "disabled");
                     gameData.lives--;
                     $("tapLives").textContent = "❤️".repeat(Math.max(0, gameData.lives));
                     if (gameData.lives <= 0) {
+                        gameData.tapLocked = true;
                         clearInterval(gameData.interval);
                         gameData.timeout = setTimeout(() => {
                             showResult(
@@ -1683,7 +1865,6 @@
                             );
                         }, 500);
                     }
-                    gameData.timeout = setTimeout(() => el.classList.remove("wrong-tap"), 400);
                 }
             }
 
@@ -1726,9 +1907,10 @@
                     );
                     return;
                 }
+
                 const w = gameData.words[gameData.index];
+                const targetWord = w.word.replace(/\s+/g, "");
                 gameData.selectedLetters = [];
-                gameData.revealed = [];
                 gameData.hintUsed = 0;
 
                 $("wordEmoji").textContent = w.emoji;
@@ -1739,10 +1921,10 @@
                 $("wordResult").textContent = "";
                 $("wordResult").className = "sort-result";
 
-                const scrambled = shuffle(w.word.split(""));
+                const scrambled = shuffle(targetWord.split(""));
                 const slots = $("wordSlots");
                 slots.innerHTML = "";
-                for (let i = 0; i < w.word.length; i++) {
+                for (let i = 0; i < targetWord.length; i++) {
                     const slot = document.createElement("div");
                     slot.className = "a-slot";
                     slot.dataset.pos = i;
@@ -1757,7 +1939,7 @@
                     btn.className = "s-letter";
                     btn.textContent = ch;
                     btn.dataset.char = ch;
-                    btn.dataset.idx = i;
+                    btn.dataset.uid = `${gameData.index}-${i}-${Math.random().toString(36).slice(2, 8)}`;
                     btn.onclick = () => addLetterToSlot(ch, btn);
                     letters.appendChild(btn);
                 });
@@ -1765,16 +1947,18 @@
 
             function addLetterToSlot(ch, btn) {
                 const w = gameData.words[gameData.index];
+                const targetWord = w.word.replace(/\s+/g, "");
                 const filledSlots = $("wordSlots").querySelectorAll(".a-slot.filled").length;
-                if (filledSlots >= w.word.length) return;
+                if (filledSlots >= targetWord.length) return;
 
                 btn.classList.add("used");
-                gameData.selectedLetters.push({ ch, btn });
+                gameData.selectedLetters.push({ ch, btn, uid: btn.dataset.uid });
 
                 const slots = $("wordSlots").querySelectorAll(".a-slot");
                 for (let s of slots) {
                     if (!s.classList.contains("filled")) {
                         s.textContent = ch;
+                        s.dataset.uid = btn.dataset.uid;
                         s.classList.add("filled");
                         break;
                     }
@@ -1787,15 +1971,23 @@
                 const slot = slots[pos];
                 if (!slot.classList.contains("filled")) return;
 
-                // Find the last selected letter that matches
-                for (let i = gameData.selectedLetters.length - 1; i >= 0; i--) {
-                    if (gameData.selectedLetters[i].ch === slot.textContent) {
-                        gameData.selectedLetters[i].btn.classList.remove("used");
-                        gameData.selectedLetters.splice(i, 1);
-                        break;
+                const uid = slot.dataset.uid;
+                const idx = gameData.selectedLetters.findIndex(l => l.uid === uid);
+                if (idx !== -1) {
+                    gameData.selectedLetters[idx].btn.classList.remove("used");
+                    gameData.selectedLetters.splice(idx, 1);
+                } else {
+                    for (let i = gameData.selectedLetters.length - 1; i >= 0; i--) {
+                        if (gameData.selectedLetters[i].ch === slot.textContent) {
+                            gameData.selectedLetters[i].btn.classList.remove("used");
+                            gameData.selectedLetters.splice(i, 1);
+                            break;
+                        }
                     }
                 }
+
                 slot.textContent = "";
+                delete slot.dataset.uid;
                 slot.classList.remove("filled");
                 $("wordResult").textContent = "";
                 $("wordResult").className = "sort-result";
@@ -1803,14 +1995,17 @@
 
             function checkWordComplete() {
                 const w = gameData.words[gameData.index];
+                const targetWord = w.word.replace(/\s+/g, "");
                 const slots = $("wordSlots").querySelectorAll(".a-slot");
                 const answer = Array.from(slots)
                     .map(s => s.textContent)
-                    .join("");
+                    .join("")
+                    .replace(/\s+/g, "");
 
-                if (answer.length === w.word.length) {
-                    if (answer === w.word) {
+                if (answer.length === targetWord.length) {
+                    if (answer === targetWord) {
                         gameData.score += 2;
+                        $("wordScore").textContent = gameData.score;
                         $("wordResult").textContent = "✅ Benar! Hebat!";
                         $("wordResult").className = "sort-result correct";
                         gameData.index++;
@@ -1828,6 +2023,7 @@
                 const slots = $("wordSlots").querySelectorAll(".a-slot");
                 slots.forEach(s => {
                     s.textContent = "";
+                    delete s.dataset.uid;
                     s.classList.remove("filled");
                 });
                 $("wordResult").textContent = "";
@@ -1836,11 +2032,12 @@
 
             function wordRevealLetter() {
                 const w = gameData.words[gameData.index];
+                const targetWord = w.word.replace(/\s+/g, "");
                 if (gameData.hintUsed >= 2) return;
 
                 const slots = $("wordSlots").querySelectorAll(".a-slot");
                 let targetPos = -1;
-                for (let i = 0; i < w.word.length; i++) {
+                for (let i = 0; i < targetWord.length; i++) {
                     if (!slots[i].classList.contains("filled")) {
                         targetPos = i;
                         break;
@@ -1848,14 +2045,15 @@
                 }
                 if (targetPos === -1) return;
 
-                const targetChar = w.word[targetPos];
+                const targetChar = targetWord[targetPos];
                 const letterBtns = $("wordLetters").querySelectorAll(".s-letter:not(.used)");
                 for (let btn of letterBtns) {
                     if (btn.dataset.char === targetChar) {
                         btn.classList.add("used");
                         slots[targetPos].textContent = targetChar;
+                        slots[targetPos].dataset.uid = btn.dataset.uid;
                         slots[targetPos].classList.add("filled");
-                        gameData.selectedLetters.push({ ch: targetChar, btn });
+                        gameData.selectedLetters.push({ ch: targetChar, btn, uid: btn.dataset.uid });
                         gameData.hintUsed++;
                         $("wordHint").textContent =
                             gameData.hintUsed >= 2
