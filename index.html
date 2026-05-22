@@ -1,0 +1,1871 @@
+<!doctype html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+        <title>🌿 Eat Smart, Waste Less - Booth Games</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                -webkit-tap-highlight-color: transparent;
+            }
+            :root {
+                --primary: #2d6a4f;
+                --secondary: #40916c;
+                --accent: #95d5b2;
+                --light: #d8f3dc;
+                --dark: #1b4332;
+                --orange: #e76f51;
+                --yellow: #e9c46a;
+                --red: #e63946;
+                --blue: #457b9d;
+            }
+            @font-face {
+                font-family: "GameFont";
+                src: local("Segoe UI"), local("Roboto"), local("sans-serif");
+            }
+            body {
+                font-family: "GameFont", sans-serif;
+                background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 50%, #40916c 100%);
+                min-height: 100vh;
+                overflow-x: hidden;
+                color: #fff;
+            }
+            .screen {
+                display: none;
+                min-height: 100vh;
+                padding: 20px;
+                animation: fadeIn 0.5s ease;
+            }
+            .screen.active {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            @keyframes bounce {
+                0%,
+                100% {
+                    transform: scale(1);
+                }
+                50% {
+                    transform: scale(1.15);
+                }
+            }
+            @keyframes shake {
+                0%,
+                100% {
+                    transform: translateX(0);
+                }
+                25% {
+                    transform: translateX(-10px);
+                }
+                75% {
+                    transform: translateX(10px);
+                }
+            }
+            @keyframes pop {
+                0% {
+                    transform: scale(0) rotate(-10deg);
+                    opacity: 0;
+                }
+                60% {
+                    transform: scale(1.2) rotate(5deg);
+                    opacity: 1;
+                }
+                100% {
+                    transform: scale(1) rotate(0);
+                }
+            }
+            @keyframes float {
+                0%,
+                100% {
+                    transform: translateY(0);
+                }
+                50% {
+                    transform: translateY(-10px);
+                }
+            }
+            @keyframes sparkle {
+                0% {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+                100% {
+                    opacity: 0;
+                    transform: scale(2);
+                }
+            }
+            @keyframes slideUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(40px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            @keyframes pulse {
+                0%,
+                100% {
+                    box-shadow: 0 0 0 0 rgba(45, 106, 79, 0.4);
+                }
+                50% {
+                    box-shadow: 0 0 0 15px rgba(45, 106, 79, 0);
+                }
+            }
+
+            .home-title {
+                font-size: clamp(1.8rem, 5vw, 3rem);
+                font-weight: 900;
+                text-align: center;
+                margin: 20px 0 5px;
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+                line-height: 1.2;
+            }
+            .home-title span {
+                color: #e9c46a;
+            }
+            .home-sub {
+                font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+                opacity: 0.85;
+                text-align: center;
+                margin-bottom: 25px;
+                font-weight: 500;
+            }
+            .home-logo {
+                font-size: clamp(3rem, 10vw, 5rem);
+                animation: float 3s ease-in-out infinite;
+            }
+            .games-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+                gap: 18px;
+                width: 100%;
+                max-width: 900px;
+                padding: 10px;
+            }
+            .game-card {
+                background: rgba(255, 255, 255, 0.12);
+                backdrop-filter: blur(10px);
+                border: 2px solid rgba(255, 255, 255, 0.15);
+                border-radius: 20px;
+                padding: 25px;
+                cursor: pointer;
+                transition: all 0.3s;
+                position: relative;
+                overflow: hidden;
+            }
+            .game-card:hover,
+            .game-card:active {
+                transform: translateY(-5px);
+                border-color: var(--accent);
+                background: rgba(255, 255, 255, 0.2);
+            }
+            .game-card::before {
+                content: "";
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+            .game-card:hover::before {
+                opacity: 1;
+            }
+            .game-card-icon {
+                font-size: 2.5rem;
+                margin-bottom: 10px;
+            }
+            .game-card-title {
+                font-size: 1.2rem;
+                font-weight: 700;
+                margin-bottom: 6px;
+            }
+            .game-card-desc {
+                font-size: 0.85rem;
+                opacity: 0.8;
+                line-height: 1.4;
+            }
+            .game-card-diff {
+                display: inline-block;
+                padding: 3px 10px;
+                border-radius: 20px;
+                font-size: 0.7rem;
+                font-weight: 700;
+                margin-top: 10px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+            .diff-easy {
+                background: #95d5b2;
+                color: #1b4332;
+            }
+            .diff-medium {
+                background: #e9c46a;
+                color: #1b4332;
+            }
+            .diff-hard {
+                background: #e76f51;
+                color: #fff;
+            }
+
+            .back-btn {
+                position: fixed;
+                top: 15px;
+                left: 15px;
+                z-index: 100;
+                background: rgba(255, 255, 255, 0.2);
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                color: #fff;
+                width: 45px;
+                height: 45px;
+                border-radius: 50%;
+                font-size: 1.3rem;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s;
+                backdrop-filter: blur(5px);
+            }
+            .back-btn:hover {
+                background: rgba(255, 255, 255, 0.35);
+                transform: scale(1.1);
+            }
+
+            .game-header {
+                text-align: center;
+                width: 100%;
+                max-width: 600px;
+                margin-bottom: 15px;
+            }
+            .game-header h2 {
+                font-size: clamp(1.3rem, 4vw, 1.8rem);
+                font-weight: 800;
+                margin-bottom: 5px;
+            }
+            .game-header p {
+                font-size: 0.85rem;
+                opacity: 0.8;
+            }
+            .score-bar {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                max-width: 600px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 15px;
+                padding: 10px 20px;
+                margin-bottom: 15px;
+                backdrop-filter: blur(5px);
+            }
+            .score-bar div {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                font-weight: 700;
+                font-size: 1rem;
+            }
+            .timer-bar {
+                width: 100%;
+                max-width: 600px;
+                height: 8px;
+                background: rgba(255, 255, 255, 0.15);
+                border-radius: 10px;
+                margin-bottom: 15px;
+                overflow: hidden;
+            }
+            .timer-fill {
+                height: 100%;
+                background: linear-gradient(90deg, var(--orange), var(--yellow));
+                border-radius: 10px;
+                transition: width 0.3s;
+            }
+
+            /* GAME 1: FOOD SORTER */
+            .sorter-container {
+                width: 100%;
+                max-width: 600px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            .food-item-display {
+                background: rgba(255, 255, 255, 0.15);
+                border-radius: 20px;
+                padding: 25px;
+                text-align: center;
+                width: 100%;
+                min-height: 120px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                backdrop-filter: blur(5px);
+                border: 2px solid rgba(255, 255, 255, 0.1);
+            }
+            .food-emoji {
+                font-size: 4rem;
+                animation: pop 0.4s ease;
+            }
+            .food-name {
+                font-size: 1.3rem;
+                font-weight: 700;
+                margin-top: 8px;
+            }
+            .food-category-hint {
+                font-size: 0.8rem;
+                opacity: 0.6;
+                margin-top: 4px;
+            }
+            .sort-buttons {
+                display: flex;
+                gap: 15px;
+                width: 100%;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .sort-btn {
+                flex: 1;
+                min-width: 140px;
+                max-width: 250px;
+                padding: 18px 15px;
+                border: none;
+                border-radius: 15px;
+                font-size: 1rem;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.2s;
+                color: #fff;
+                text-align: center;
+            }
+            .sort-btn:active {
+                transform: scale(0.95);
+            }
+            .btn-eat {
+                background: linear-gradient(135deg, #2d6a4f, #40916c);
+                border: 2px solid #52b788;
+            }
+            .btn-waste {
+                background: linear-gradient(135deg, #e76f51, #f4a261);
+                border: 2px solid #e9c46a;
+            }
+            .btn-reuse {
+                background: linear-gradient(135deg, #457b9d, #1d3557);
+                border: 2px solid #a8dadc;
+            }
+            .sort-result {
+                font-size: 1.2rem;
+                font-weight: 700;
+                padding: 12px 25px;
+                border-radius: 12px;
+                animation: slideUp 0.3s ease;
+                text-align: center;
+                min-height: 50px;
+            }
+            .correct {
+                background: rgba(45, 106, 79, 0.3);
+                border: 2px solid #95d5b2;
+                color: #d8f3dc;
+            }
+            .wrong {
+                background: rgba(230, 57, 70, 0.3);
+                border: 2px solid #e63946;
+                color: #ffcccc;
+            }
+            .combo-display {
+                font-size: 0.9rem;
+                color: #e9c46a;
+                font-weight: 700;
+                min-height: 25px;
+            }
+
+            /* GAME 2: QUIZ */
+            .quiz-container {
+                width: 100%;
+                max-width: 600px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            .quiz-question {
+                background: rgba(255, 255, 255, 0.12);
+                border-radius: 20px;
+                padding: 25px;
+                width: 100%;
+                text-align: center;
+                backdrop-filter: blur(5px);
+                border: 2px solid rgba(255, 255, 255, 0.1);
+            }
+            .quiz-q-num {
+                font-size: 0.8rem;
+                opacity: 0.6;
+                margin-bottom: 8px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+            .quiz-q-text {
+                font-size: clamp(1rem, 3vw, 1.2rem);
+                font-weight: 700;
+                line-height: 1.4;
+            }
+            .quiz-q-emoji {
+                font-size: 2.5rem;
+                margin-bottom: 10px;
+            }
+            .quiz-options {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                width: 100%;
+            }
+            .quiz-opt {
+                background: rgba(255, 255, 255, 0.1);
+                border: 2px solid rgba(255, 255, 255, 0.2);
+                border-radius: 15px;
+                padding: 15px 20px;
+                color: #fff;
+                font-size: 1rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s;
+                text-align: left;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .quiz-opt:hover,
+            .quiz-opt:active {
+                background: rgba(255, 255, 255, 0.2);
+                border-color: var(--accent);
+                transform: translateX(5px);
+            }
+            .quiz-opt.correct-opt {
+                background: rgba(45, 106, 79, 0.4) !important;
+                border-color: #95d5b2 !important;
+                animation: bounce 0.4s;
+            }
+            .quiz-opt.wrong-opt {
+                background: rgba(230, 57, 70, 0.3) !important;
+                border-color: #e63946 !important;
+                animation: shake 0.4s;
+            }
+            .quiz-opt-letter {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.2);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 800;
+                font-size: 0.9rem;
+                flex-shrink: 0;
+            }
+            .quiz-progress {
+                display: flex;
+                gap: 6px;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            .quiz-dot {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.2);
+                transition: all 0.3s;
+            }
+            .quiz-dot.active {
+                background: var(--accent);
+                transform: scale(1.2);
+            }
+            .quiz-dot.answered {
+                background: #95d5b2;
+            }
+            .quiz-dot.wrong-dot {
+                background: #e63946;
+            }
+
+            /* GAME 3: MEMORY */
+            .memory-container {
+                width: 100%;
+                max-width: 500px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            .memory-grid {
+                display: grid;
+                gap: 8px;
+                width: 100%;
+            }
+            .memory-grid.g4x4 {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            .memory-card {
+                aspect-ratio: 1;
+                border-radius: 12px;
+                cursor: pointer;
+                position: relative;
+                transform-style: preserve-3d;
+                transition: transform 0.4s;
+            }
+            .memory-card.flipped {
+                transform: rotateY(180deg);
+            }
+            .memory-card.matched {
+                animation: bounce 0.4s;
+                opacity: 0.8;
+            }
+            .memory-card.matched {
+                pointer-events: none;
+            }
+            .memory-card-front,
+            .memory-card-back {
+                position: absolute;
+                inset: 0;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                backface-visibility: hidden;
+            }
+            .memory-card-front {
+                background: linear-gradient(135deg, var(--primary), var(--secondary));
+                border: 2px solid rgba(255, 255, 255, 0.2);
+                font-size: clamp(1.5rem, 5vw, 2rem);
+            }
+            .memory-card-back {
+                background: rgba(255, 255, 255, 0.12);
+                border: 2px solid rgba(255, 255, 255, 0.15);
+                transform: rotateY(180deg);
+                font-size: clamp(1.5rem, 5vw, 2.2rem);
+                backdrop-filter: blur(5px);
+            }
+            .memory-stats {
+                display: flex;
+                gap: 20px;
+                justify-content: center;
+            }
+            .memory-stats div {
+                text-align: center;
+            }
+            .memory-stats span {
+                font-size: 1.5rem;
+                font-weight: 800;
+            }
+            .memory-stats label {
+                font-size: 0.75rem;
+                opacity: 0.7;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            /* GAME 4: TAP CORRECT */
+            .tap-container {
+                width: 100%;
+                max-width: 600px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            .tap-instruction {
+                background: rgba(255, 255, 255, 0.12);
+                border-radius: 15px;
+                padding: 15px 20px;
+                text-align: center;
+                width: 100%;
+                backdrop-filter: blur(5px);
+            }
+            .tap-instruction p {
+                font-size: 1rem;
+                font-weight: 600;
+            }
+            .tap-instruction .highlight {
+                color: #e9c46a;
+                font-weight: 800;
+            }
+            .tap-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+                width: 100%;
+            }
+            .tap-item {
+                background: rgba(255, 255, 255, 0.1);
+                border: 2px solid rgba(255, 255, 255, 0.15);
+                border-radius: 15px;
+                padding: 15px;
+                text-align: center;
+                cursor: pointer;
+                transition: all 0.15s;
+                min-height: 90px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 5px;
+                user-select: none;
+            }
+            .tap-item:active {
+                transform: scale(0.92);
+            }
+            .tap-item .emoji {
+                font-size: 2rem;
+            }
+            .tap-item .label {
+                font-size: 0.75rem;
+                font-weight: 600;
+                opacity: 0.9;
+            }
+            .tap-item.correct-tap {
+                background: rgba(45, 106, 79, 0.4) !important;
+                border-color: #95d5b2 !important;
+                animation: pop 0.3s;
+            }
+            .tap-item.wrong-tap {
+                background: rgba(230, 57, 70, 0.3) !important;
+                border-color: #e63946 !important;
+                animation: shake 0.3s;
+            }
+            .tap-item.disabled {
+                pointer-events: none;
+                opacity: 0.4;
+            }
+            .tap-round-info {
+                font-size: 0.85rem;
+                opacity: 0.7;
+                text-align: center;
+            }
+
+            /* GAME 5: WORD SCRAMBLE */
+            .word-container {
+                width: 100%;
+                max-width: 600px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            .word-hint {
+                background: rgba(255, 255, 255, 0.12);
+                border-radius: 15px;
+                padding: 20px;
+                text-align: center;
+                width: 100%;
+                backdrop-filter: blur(5px);
+            }
+            .word-hint .emoji {
+                font-size: 3rem;
+                margin-bottom: 8px;
+            }
+            .word-hint .hint-text {
+                font-size: 0.9rem;
+                opacity: 0.7;
+                font-style: italic;
+            }
+            .scramble-letters {
+                display: flex;
+                gap: 8px;
+                flex-wrap: wrap;
+                justify-content: center;
+                padding: 15px;
+            }
+            .s-letter {
+                width: 48px;
+                height: 48px;
+                background: rgba(255, 255, 255, 0.15);
+                border: 2px solid rgba(255, 255, 255, 0.2);
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.3rem;
+                font-weight: 800;
+                cursor: pointer;
+                transition: all 0.2s;
+                text-transform: uppercase;
+            }
+            .s-letter:active {
+                transform: scale(0.9);
+            }
+            .s-letter.used {
+                opacity: 0.3;
+                pointer-events: none;
+                transform: scale(0.85);
+            }
+            .answer-slots {
+                display: flex;
+                gap: 6px;
+                justify-content: center;
+                flex-wrap: wrap;
+                min-height: 55px;
+                padding: 10px;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 12px;
+                width: 100%;
+                max-width: 400px;
+            }
+            .a-slot {
+                width: 44px;
+                height: 48px;
+                background: rgba(255, 255, 255, 0.1);
+                border: 2px dashed rgba(255, 255, 255, 0.2);
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.3rem;
+                font-weight: 800;
+                text-transform: uppercase;
+                transition: all 0.2s;
+                cursor: pointer;
+            }
+            .a-slot.filled {
+                background: rgba(255, 255, 255, 0.2);
+                border-style: solid;
+            }
+            .word-actions {
+                display: flex;
+                gap: 10px;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            .word-action-btn {
+                padding: 12px 25px;
+                border: none;
+                border-radius: 12px;
+                font-size: 0.9rem;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.2s;
+                color: #fff;
+            }
+            .word-action-btn:active {
+                transform: scale(0.95);
+            }
+            .btn-clear {
+                background: rgba(230, 57, 70, 0.3);
+                border: 2px solid #e63946;
+            }
+            .btn-hint-word {
+                background: rgba(233, 196, 106, 0.3);
+                border: 2px solid #e9c46a;
+            }
+
+            /* RESULT SCREEN */
+            .result-container {
+                text-align: center;
+                max-width: 500px;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+            .result-emoji {
+                font-size: 4rem;
+                animation: pop 0.5s ease;
+            }
+            .result-title {
+                font-size: clamp(1.5rem, 5vw, 2.2rem);
+                font-weight: 900;
+            }
+            .result-score {
+                font-size: clamp(2rem, 8vw, 3.5rem);
+                font-weight: 900;
+                color: #e9c46a;
+            }
+            .result-detail {
+                font-size: 1rem;
+                opacity: 0.8;
+                line-height: 1.6;
+                max-width: 400px;
+            }
+            .result-stars {
+                font-size: 2rem;
+                letter-spacing: 8px;
+            }
+            .result-tip {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 15px;
+                padding: 18px;
+                width: 100%;
+                text-align: left;
+                font-size: 0.9rem;
+                line-height: 1.5;
+                backdrop-filter: blur(5px);
+                border-left: 4px solid var(--accent);
+            }
+            .result-tip strong {
+                color: #e9c46a;
+            }
+            .result-btns {
+                display: flex;
+                gap: 12px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .result-btn {
+                padding: 14px 28px;
+                border: none;
+                border-radius: 15px;
+                font-size: 1rem;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.2s;
+                color: #fff;
+            }
+            .result-btn:active {
+                transform: scale(0.95);
+            }
+            .btn-retry {
+                background: linear-gradient(135deg, var(--primary), var(--secondary));
+            }
+            .btn-home {
+                background: rgba(255, 255, 255, 0.15);
+                border: 2px solid rgba(255, 255, 255, 0.3);
+            }
+
+            .particles {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 999;
+                overflow: hidden;
+            }
+            .particle {
+                position: absolute;
+                font-size: 1.5rem;
+                animation: particleFall 1.5s ease-out forwards;
+            }
+            @keyframes particleFall {
+                0% {
+                    opacity: 1;
+                    transform: translateY(0) rotate(0deg) scale(1);
+                }
+                100% {
+                    opacity: 0;
+                    transform: translateY(100vh) rotate(720deg) scale(0.3);
+                }
+            }
+
+            @media (max-width: 400px) {
+                .games-grid {
+                    grid-template-columns: 1fr;
+                }
+                .sort-buttons {
+                    flex-direction: column;
+                }
+                .sort-btn {
+                    max-width: 100%;
+                }
+                .memory-grid.g4x4 {
+                    gap: 6px;
+                }
+                .tap-grid {
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 8px;
+                }
+                .tap-item {
+                    min-height: 75px;
+                    padding: 10px;
+                }
+                .s-letter {
+                    width: 42px;
+                    height: 42px;
+                    font-size: 1.1rem;
+                }
+                .a-slot {
+                    width: 38px;
+                    height: 42px;
+                    font-size: 1.1rem;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- HOME SCREEN -->
+        <div id="homeScreen" class="screen active">
+            <div class="home-logo">🌍🥗♻️</div>
+            <h1 class="home-title">Eat Smart,<br /><span>Waste Less!</span></h1>
+            <p class="home-sub">Mainkan game edukatif & belajar tentang makan cerdas, kurangi sampah makanan!</p>
+            <div class="games-grid">
+                <div class="game-card" onclick="startGame('sorter')">
+                    <div class="game-card-icon">🍽️</div>
+                    <div class="game-card-title">Food Sorter</div>
+                    <div class="game-card-desc">
+                        Sortir makanan ke kategori yang tepat: Makan Cerdas, Kurangi Sampah, atau Daur Ulang!
+                    </div>
+                    <span class="game-card-diff diff-easy">Mudah</span>
+                </div>
+                <div class="game-card" onclick="startGame('quiz')">
+                    <div class="game-card-icon">🧠</div>
+                    <div class="game-card-title">Eco Quiz</div>
+                    <div class="game-card-desc">
+                        Uji pengetahuanmu tentang makanan, nutrisi, dan pengurangan limbah makanan!
+                    </div>
+                    <span class="game-card-diff diff-easy">Mudah</span>
+                </div>
+                <div class="game-card" onclick="startGame('memory')">
+                    <div class="game-card-icon">🃏</div>
+                    <div class="game-card-title">Memory Match</div>
+                    <div class="game-card-desc">
+                        Cocokkan pasangan kartu makanan dan pelajari fakta menarik di baliknya!
+                    </div>
+                    <span class="game-card-diff diff-medium">Sedang</span>
+                </div>
+                <div class="game-card" onclick="startGame('tap')">
+                    <div class="game-card-icon">👆</div>
+                    <div class="game-card-title">Tap & Learn</div>
+                    <div class="game-card-desc">Tap item yang benar secepat mungkin sebelum waktu habis!</div>
+                    <span class="game-card-diff diff-medium">Sedang</span>
+                </div>
+                <div class="game-card" onclick="startGame('word')">
+                    <div class="game-card-icon">🔤</div>
+                    <div class="game-card-title">Word Scramble</div>
+                    <div class="game-card-desc">Susun huruf acak menjadi kata terkait "Eat Smart, Waste Less"!</div>
+                    <span class="game-card-diff diff-hard">Sulit</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- GAME 1: FOOD SORTER -->
+        <div id="sorterScreen" class="screen">
+            <button class="back-btn" onclick="goHome()">←</button>
+            <div class="game-header">
+                <h2>🍽️ Food Sorter</h2>
+                <p>Pilih kategori yang tepat untuk setiap item!</p>
+            </div>
+            <div class="score-bar">
+                <div>⭐ <span id="sorterScore">0</span></div>
+                <div>🔥 <span id="sorterCombo">0</span>x</div>
+                <div>📦 <span id="sorterProgress">0/15</span></div>
+            </div>
+            <div class="combo-display" id="sorterComboText"></div>
+            <div class="sorter-container">
+                <div class="food-item-display">
+                    <div class="food-emoji" id="sorterEmoji">🍎</div>
+                    <div class="food-name" id="sorterFoodName">Apel</div>
+                    <div class="food-category-hint" id="sorterHint"></div>
+                </div>
+                <div class="sort-buttons">
+                    <button class="sort-btn btn-eat" onclick="sortAnswer('eat')">🥗<br />Eat Smart</button>
+                    <button class="sort-btn btn-waste" onclick="sortAnswer('waste')">🗑️<br />Waste Less</button>
+                    <button class="sort-btn btn-reuse" onclick="sortAnswer('reuse')">♻️<br />Reuse/Compost</button>
+                </div>
+                <div class="sort-result" id="sorterResult"></div>
+            </div>
+        </div>
+
+        <!-- GAME 2: QUIZ -->
+        <div id="quizScreen" class="screen">
+            <button class="back-btn" onclick="goHome()">←</button>
+            <div class="game-header">
+                <h2>🧠 Eco Quiz</h2>
+                <p>Jawab pertanyaan tentang Eat Smart, Waste Less!</p>
+            </div>
+            <div class="score-bar">
+                <div>⭐ <span id="quizScore">0</span></div>
+                <div>📝 <span id="quizProgress">1/10</span></div>
+            </div>
+            <div class="quiz-progress" id="quizDots"></div>
+            <div class="quiz-container">
+                <div class="quiz-question">
+                    <div class="quiz-q-emoji" id="quizEmoji">🌾</div>
+                    <div class="quiz-q-num" id="quizQNum">Pertanyaan 1 dari 10</div>
+                    <div class="quiz-q-text" id="quizQText">Loading...</div>
+                </div>
+                <div class="quiz-options" id="quizOptions"></div>
+            </div>
+        </div>
+
+        <!-- GAME 3: MEMORY -->
+        <div id="memoryScreen" class="screen">
+            <button class="back-btn" onclick="goHome()">←</button>
+            <div class="game-header">
+                <h2>🃏 Memory Match</h2>
+                <p>Temukan pasangan kartu makanan!</p>
+            </div>
+            <div class="score-bar">
+                <div>🎯 <span id="memoryPairs">0/8</span></div>
+                <div>👆 <span id="memoryMoves">0</span></div>
+                <div>⏱️ <span id="memoryTimer">0:00</span></div>
+            </div>
+            <div class="memory-container">
+                <div class="memory-grid g4x4" id="memoryGrid"></div>
+            </div>
+        </div>
+
+        <!-- GAME 4: TAP CORRECT -->
+        <div id="tapScreen" class="screen">
+            <button class="back-btn" onclick="goHome()">←</button>
+            <div class="game-header">
+                <h2>👆 Tap & Learn</h2>
+                <p>Tap item sesuai instruksi secepatnya!</p>
+            </div>
+            <div class="score-bar">
+                <div>⭐ <span id="tapScore">0</span></div>
+                <div>❤️ <span id="tapLives">5</span></div>
+                <div>⏱️ <span id="tapTimer">60</span>s</div>
+            </div>
+            <div class="timer-bar"><div class="timer-fill" id="tapTimerBar" style="width: 100%"></div></div>
+            <div class="tap-container">
+                <div class="tap-instruction">
+                    <p id="tapInstruction">Tap semua yang <span class="highlight">SEHAT</span>!</p>
+                </div>
+                <div class="tap-round-info" id="tapRoundInfo">Round 1/5</div>
+                <div class="tap-grid" id="tapGrid"></div>
+            </div>
+        </div>
+
+        <!-- GAME 5: WORD SCRAMBLE -->
+        <div id="wordScreen" class="screen">
+            <button class="back-btn" onclick="goHome()">←</button>
+            <div class="game-header">
+                <h2>🔤 Word Scramble</h2>
+                <p>Susun huruf menjadi kata yang benar!</p>
+            </div>
+            <div class="score-bar">
+                <div>⭐ <span id="wordScore">0</span></div>
+                <div>📝 <span id="wordProgress">1/10</span></div>
+            </div>
+            <div class="word-container">
+                <div class="word-hint">
+                    <div class="emoji" id="wordEmoji">🥦</div>
+                    <div class="quiz-q-text" id="wordHintText">Petunjuk akan muncul di sini</div>
+                    <div class="hint-text" id="wordHint">Klik 💡 untuk petunjuk</div>
+                </div>
+                <div class="answer-slots" id="wordSlots"></div>
+                <div class="scramble-letters" id="wordLetters"></div>
+                <div class="word-actions">
+                    <button class="word-action-btn btn-hint-word" onclick="wordRevealLetter()">💡 Buka 1 Huruf</button>
+                    <button class="word-action-btn btn-clear" onclick="wordClear()">🗑️ Reset</button>
+                </div>
+                <div class="sort-result" id="wordResult"></div>
+            </div>
+        </div>
+
+        <!-- RESULT SCREEN -->
+        <div id="resultScreen" class="screen">
+            <div class="result-container">
+                <div class="result-emoji" id="resultEmoji">🎉</div>
+                <div class="result-title" id="resultTitle">Luar Biasa!</div>
+                <div class="result-stars" id="resultStars">⭐⭐⭐</div>
+                <div class="result-score" id="resultScore">100</div>
+                <div class="result-detail" id="resultDetail">Kamu menjawab 8 dari 10 dengan benar!</div>
+                <div class="result-tip" id="resultTip">
+                    <strong>💡 Tahukah kamu?</strong><br />
+                    Indonesia menghasilkan 23 juta ton sampah makanan per tahun. Mulai dari diri sendiri untuk
+                    mengurangi food waste!
+                </div>
+                <div class="result-btns">
+                    <button class="result-btn btn-retry" onclick="retryGame()">🔄 Main Lagi</button>
+                    <button class="result-btn btn-home" onclick="goHome()">🏠 Menu Utama</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="particles" id="particles"></div>
+
+        <script>
+            // ============ UTILITIES ============
+            const $ = id => document.getElementById(id);
+            const rand = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
+            const shuffle = arr => {
+                let a = [...arr];
+                for (let i = a.length - 1; i > 0; i--) {
+                    let j = rand(0, i);
+                    [a[i], a[j]] = [a[j], a[i]];
+                }
+                return a;
+            };
+
+            let currentGame = "";
+            let gameData = {};
+
+            function showScreen(id) {
+                document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+                $(id).classList.add("active");
+            }
+            function goHome() {
+                clearAllTimers();
+                showScreen("homeScreen");
+            }
+            function clearAllTimers() {
+                if (gameData.timer) clearInterval(gameData.timer);
+                if (gameData.interval) clearInterval(gameData.interval);
+                if (gameData.timeout) clearTimeout(gameData.timeout);
+                gameData.timer = gameData.interval = gameData.timeout = null;
+            }
+
+            function spawnParticles(type = "confetti") {
+                const p = $("particles");
+                p.innerHTML = "";
+                const emojis =
+                    type === "confetti"
+                        ? ["🎉", "✨", "⭐", "🌟", "💫", "🎊", "🥳", "💚"]
+                        : ["🍎", "🥦", "♻️", "🌿", "💚"];
+                for (let i = 0; i < 25; i++) {
+                    const d = document.createElement("div");
+                    d.className = "particle";
+                    d.textContent = emojis[rand(0, emojis.length - 1)];
+                    d.style.left = rand(0, 100) + "%";
+                    d.style.top = rand(-20, 0) + "%";
+                    d.style.animationDelay = Math.random() * 1 + "s";
+                    d.style.animationDuration = 1 + Math.random() * 2 + "s";
+                    p.appendChild(d);
+                }
+                setTimeout(() => (p.innerHTML = ""), 4000);
+            }
+
+            function calcStars(score, max) {
+                const pct = score / max;
+                if (pct >= 0.9) return 3;
+                if (pct >= 0.6) return 2;
+                if (pct >= 0.3) return 1;
+                return 0;
+            }
+
+            function showResult(game, score, max, detail) {
+                clearAllTimers();
+                const stars = calcStars(score, max);
+                const emojis = ["😢", "🙂", "😊", "🤩"];
+                const titles = ["Coba Lagi!", "Lumayan!", "Bagus!", "Luar Biasa!"];
+                $("resultEmoji").textContent = emojis[stars];
+                $("resultTitle").textContent = titles[stars];
+                $("resultStars").textContent = "⭐".repeat(stars) + "☆".repeat(3 - stars);
+                $("resultScore").textContent = score + "/" + max;
+                $("resultDetail").textContent = detail;
+
+                const tips = {
+                    sorter: "<strong>💡 Tahukah kamu?</strong><br>Setiap tahun, 1/3 makanan yang diproduksi di dunia terbuang sia-sia. Mulai dari merencanakan menu mingguan untuk mengurangi food waste!",
+                    quiz: "<strong>💡 Tahukah kamu?</strong><br>Indonesia adalah penghasil sampah makanan terbesar kedua di dunia. Dengan Eat Smart, Waste Less, kita bisa mengubah kebiasaan ini!",
+                    memory: "<strong>💡 Tahukah kamu?</strong><br>Menyimpan makanan dengan benar bisa memperpanjang masa simpan hingga 50%. Pelajari cara menyimpan setiap jenis makanan!",
+                    tap: "<strong>💡 Tahukah kamu?</strong><br>Makanan yang berwarna-warni (buah & sayur) mengandung nutrisi lebih beragam. Jangan lupa isi piringmu dengan warna!",
+                    word: "<strong>💡 Tahukah kamu?</strong><br>Kompos dari sisa makanan bisa mengurangi emisi metana dari TPA hingga 30%. Mulai kompos di rumahmu!",
+                };
+                $("resultTip").innerHTML = tips[game] || tips.sorter;
+                showScreen("resultScreen");
+                if (stars >= 2) spawnParticles();
+            }
+
+            function retryGame() {
+                startGame(currentGame);
+            }
+
+            // ============ GAME 1: FOOD SORTER ============
+            const sorterItems = [
+                { emoji: "🍎", name: "Apel Segar", cat: "eat", fact: "Buah segar kaya serat dan vitamin!" },
+                { emoji: "🥦", name: "Brokoli", cat: "eat", fact: "Sayuran hijau super bergizi!" },
+                {
+                    emoji: "🍞",
+                    name: "Roti Kadaluarsa",
+                    cat: "waste",
+                    fact: "Roti basi bisa jadi kompos, jangan dimakan!",
+                },
+                {
+                    emoji: "🥕",
+                    name: "Wortel Layu",
+                    cat: "reuse",
+                    fact: "Wortel layu masih bisa jadi kaldu atau kompos!",
+                },
+                { emoji: "🍗", name: "Ayam Busuk", cat: "waste", fact: "Daging busuk berbahaya, buang dengan benar!" },
+                { emoji: "🍚", name: "Nasi Sisa", cat: "reuse", fact: "Nasi sisa bisa jadi nasi goreng atau kompos!" },
+                { emoji: "🥗", name: "Salad Segar", cat: "eat", fact: "Salad penuh nutrisi, pilih yang segar!" },
+                {
+                    emoji: "🧃",
+                    name: "Jus Kadaluarsa",
+                    cat: "waste",
+                    fact: "Minuman kadaluarsa bisa menyebabkan sakit!",
+                },
+                { emoji: "🥚", name: "Telur Segar", cat: "eat", fact: "Telur sumber protein berkualitas tinggi!" },
+                { emoji: "🍌", name: "Kulit Pisang", cat: "reuse", fact: "Kulit pisang bagus untuk pupuk kompos!" },
+                { emoji: "🐟", name: "Ikan Segar", cat: "eat", fact: "Ikan mengandung omega-3 yang baik!" },
+                { emoji: "🥛", name: "Susu Basi", cat: "waste", fact: "Susu basi jangan diminum, bisa sakit perut!" },
+                { emoji: "🍅", name: "Tomat Busuk", cat: "waste", fact: "Tomat busuk bisa jadi kompos!" },
+                {
+                    emoji: "🥬",
+                    name: "Sisa Sayuran",
+                    cat: "reuse",
+                    fact: "Sisa sayuran bisa dibuat kaldu atau kompos!",
+                },
+                { emoji: "🍊", name: "Jeruk Segar", cat: "eat", fact: "Jeruk kaya vitamin C untuk imunitas!" },
+                {
+                    emoji: "🥜",
+                    name: "Kacang Tengik",
+                    cat: "waste",
+                    fact: "Kacang tengik mengandung racun, jangan dimakan!",
+                },
+                { emoji: "🍳", name: "Telur Matang", cat: "eat", fact: "Telur matang sumber protein yang baik!" },
+                {
+                    emoji: "🫙",
+                    name: "Toples Kaca",
+                    cat: "reuse",
+                    fact: "Toples kaca bisa digunakan kembali berkali-kali!",
+                },
+                { emoji: "🥑", name: "Alpukat Segar", cat: "eat", fact: "Alpukat mengandung lemak sehat!" },
+                { emoji: "🍎", name: "Kulit Apel", cat: "reuse", fact: "Kulit apel bisa jadi kompos yang bagus!" },
+            ];
+
+            function startGame(type) {
+                currentGame = type;
+                gameData = {};
+                switch (type) {
+                    case "sorter":
+                        initSorter();
+                        break;
+                    case "quiz":
+                        initQuiz();
+                        break;
+                    case "memory":
+                        initMemory();
+                        break;
+                    case "tap":
+                        initTap();
+                        break;
+                    case "word":
+                        initWord();
+                        break;
+                }
+            }
+
+            function initSorter() {
+                gameData.items = shuffle(sorterItems).slice(0, 15);
+                gameData.index = 0;
+                gameData.score = 0;
+                gameData.combo = 0;
+                gameData.maxCombo = 0;
+                showScreen("sorterScreen");
+                renderSorterItem();
+            }
+
+            function renderSorterItem() {
+                if (gameData.index >= gameData.items.length) {
+                    showResult(
+                        "sorter",
+                        gameData.score,
+                        gameData.items.length * 2,
+                        `Skor: ${gameData.score}, Combo tertinggi: ${gameData.maxCombo}x`,
+                    );
+                    return;
+                }
+                const item = gameData.items[gameData.index];
+                $("sorterEmoji").textContent = item.emoji;
+                $("sorterFoodName").textContent = item.name;
+                $("sorterScore").textContent = gameData.score;
+                $("sorterCombo").textContent = gameData.combo;
+                $("sorterProgress").textContent = `${gameData.index + 1}/${gameData.items.length}`;
+                $("sorterResult").textContent = "";
+                $("sorterResult").className = "sort-result";
+                $("sorterComboText").textContent = gameData.combo >= 3 ? `🔥 ${gameData.combo}x COMBO!` : "";
+            }
+
+            function sortAnswer(cat) {
+                const item = gameData.items[gameData.index];
+                const isCorrect = item.cat === cat;
+                const result = $("sorterResult");
+
+                if (isCorrect) {
+                    gameData.combo++;
+                    if (gameData.combo > gameData.maxCombo) gameData.maxCombo = gameData.combo;
+                    const points = 1 + (gameData.combo >= 3 ? 1 : 0);
+                    gameData.score += points;
+                    result.textContent = `✅ Benar! ${item.fact}`;
+                    result.className = "sort-result correct";
+                } else {
+                    gameData.combo = 0;
+                    const catNames = { eat: "Eat Smart", waste: "Waste Less", reuse: "Reuse/Compost" };
+                    result.textContent = `❌ Salah! Jawaban: ${catNames[item.cat]}. ${item.fact}`;
+                    result.className = "sort-result wrong";
+                }
+                gameData.index++;
+                renderSorterItem();
+            }
+
+            // ============ GAME 2: QUIZ ============
+            const quizQuestions = [
+                {
+                    emoji: "🍽️",
+                    q: "Berapa persen makanan yang terbuang di Indonesia setiap tahun?",
+                    opts: ["5%", "15%", "30%", "50%"],
+                    ans: 2,
+                    fact: "Sekitar 30% makanan yang diproduksi terbuang sia-sia!",
+                },
+                {
+                    emoji: "🥗",
+                    q: 'Apa arti "Eat Smart"?',
+                    opts: ["Makan banyak", "Makan dengan pola gizi seimbang", "Makan mahal", "Makan cepat"],
+                    ans: 1,
+                    fact: "Eat Smart berarti memilih makanan bergizi seimbang!",
+                },
+                {
+                    emoji: "🗑️",
+                    q: 'Apa yang dimaksud "food waste"?',
+                    opts: ["Makanan segar", "Sampah makanan", "Minuman kemasan", "Pupuk"],
+                    ans: 1,
+                    fact: "Food waste adalah makanan yang terbuang dan tidak terkonsumsi!",
+                },
+                {
+                    emoji: "🌍",
+                    q: "Gas rumah kaca dari sampah makanan di TPA adalah?",
+                    opts: ["Oksigen", "Nitrogen", "Metana", "Helium"],
+                    ans: 2,
+                    fact: "Sampah makanan di TPA menghasilkan gas metana yang berbahaya!",
+                },
+                {
+                    emoji: "❄️",
+                    q: "Cara menyimpan makanan agar tahan lama?",
+                    opts: ["Biarkan di suhu ruang", "Masukkan ke kulkas", "Jemur di matahari", "Rendam air"],
+                    ans: 1,
+                    fact: "Kulkas memperlambat pertumbuhan bakteri pada makanan!",
+                },
+                {
+                    emoji: "🥕",
+                    q: "Bagian sayuran yang sering dibuang tapi bisa dimakan?",
+                    opts: ["Daun wortel", "Kulit kentang", "Batang brokoli", "Semua benar"],
+                    ans: 3,
+                    fact: "Daun wortel, kulit kentang, dan batang brokoli bisa diolah jadi makanan!",
+                },
+                {
+                    emoji: "📅",
+                    q: 'Apa perbedaan "Best Before" dan "Use By"?',
+                    opts: [
+                        "Sama saja",
+                        "Best Before = kualitas, Use By = keamanan",
+                        "Use By = kualitas",
+                        "Tidak ada artinya",
+                    ],
+                    ans: 1,
+                    fact: "Best Before tentang kualitas, Use By tentang keamanan pangan!",
+                },
+                {
+                    emoji: "🍲",
+                    q: "Apa yang bisa dilakukan dengan sisa makanan?",
+                    opts: ["Buang semua", "Masak ulang jadi menu baru", "Berikan ke hewan saja", "Diamkan saja"],
+                    ans: 1,
+                    fact: "Sisa makanan bisa diolah jadi kreasi menu baru yang lezat!",
+                },
+                {
+                    emoji: "🛒",
+                    q: "Tips belanja cerdas untuk mengurangi waste?",
+                    opts: [
+                        "Belanja tanpa daftar",
+                        "Buat daftar belanja & ikuti",
+                        "Beli semua yang diskon",
+                        "Belanja saat lapar",
+                    ],
+                    ans: 1,
+                    fact: "Membuat daftar belanja membantu membeli hanya yang dibutuhkan!",
+                },
+                {
+                    emoji: "♻️",
+                    q: "Apa itu kompos?",
+                    opts: ["Jenis makanan", "Pupuk dari bahan organik", "Jenis sampah plastik", "Minuman kesehatan"],
+                    ans: 1,
+                    fact: "Kompos adalah pupuk alami dari dekomposisi bahan organik!",
+                },
+            ];
+
+            function initQuiz() {
+                gameData.questions = shuffle(quizQuestions).slice(0, 10);
+                gameData.index = 0;
+                gameData.score = 0;
+                gameData.answers = [];
+                showScreen("quizScreen");
+                renderQuizQuestion();
+            }
+
+            function renderQuizQuestion() {
+                if (gameData.index >= gameData.questions.length) {
+                    showResult(
+                        "quiz",
+                        gameData.score,
+                        gameData.questions.length,
+                        `Kamu menjawab ${gameData.score} dari ${gameData.questions.length} pertanyaan dengan benar!`,
+                    );
+                    return;
+                }
+                const q = gameData.questions[gameData.index];
+                $("quizEmoji").textContent = q.emoji;
+                $("quizQNum").textContent = `Pertanyaan ${gameData.index + 1} dari ${gameData.questions.length}`;
+                $("quizQText").textContent = q.q;
+                $("quizScore").textContent = gameData.score;
+                $("quizProgress").textContent = `${gameData.index + 1}/${gameData.questions.length}`;
+
+                const dots = $("quizDots");
+                dots.innerHTML = "";
+                for (let i = 0; i < gameData.questions.length; i++) {
+                    const d = document.createElement("div");
+                    d.className = "quiz-dot";
+                    if (i < gameData.index) d.classList.add(gameData.answers[i] ? "answered" : "wrong-dot");
+                    if (i === gameData.index) d.classList.add("active");
+                    dots.appendChild(d);
+                }
+
+                const opts = $("quizOptions");
+                opts.innerHTML = "";
+                const letters = ["A", "B", "C", "D"];
+                q.opts.forEach((o, i) => {
+                    const btn = document.createElement("button");
+                    btn.className = "quiz-opt";
+                    btn.innerHTML = `<span class="quiz-opt-letter">${letters[i]}</span> ${o}`;
+                    btn.onclick = () => quizAnswer(i);
+                    opts.appendChild(btn);
+                });
+            }
+
+            function quizAnswer(idx) {
+                const q = gameData.questions[gameData.index];
+                const opts = document.querySelectorAll(".quiz-opt");
+                const isCorrect = idx === q.ans;
+                gameData.answers.push(isCorrect);
+                if (isCorrect) gameData.score++;
+
+                opts.forEach((o, i) => {
+                    o.style.pointerEvents = "none";
+                    if (i === q.ans) o.classList.add("correct-opt");
+                    if (i === idx && !isCorrect) o.classList.add("wrong-opt");
+                });
+
+                gameData.timeout = setTimeout(() => {
+                    gameData.index++;
+                    renderQuizQuestion();
+                }, 1500);
+            }
+
+            // ============ GAME 3: MEMORY ============
+            const memoryPairs = [
+                { emoji: "🥗", fact: "Salad sehat!" },
+                { emoji: "🍎", fact: "Apel kaya serat!" },
+                { emoji: "🥦", fact: "Brokoli penuh vitamin!" },
+                { emoji: "🐟", fact: "Ikan sumber omega-3!" },
+                { emoji: "🥕", fact: "Wortel baik untuk mata!" },
+                { emoji: "🍚", fact: "Nasi sumber energi!" },
+                { emoji: "🥛", fact: "Susu kaya kalsium!" },
+                { emoji: "🍌", fact: "Pisang kaya kalium!" },
+            ];
+
+            function initMemory() {
+                gameData.cards = [];
+                gameData.flipped = [];
+                gameData.matched = 0;
+                gameData.moves = 0;
+                gameData.locked = false;
+                gameData.seconds = 0;
+
+                memoryPairs.forEach((p, i) => {
+                    gameData.cards.push({ id: i * 2, pairId: i, emoji: p.emoji, fact: p.fact, matched: false });
+                    gameData.cards.push({ id: i * 2 + 1, pairId: i, emoji: p.emoji, fact: p.fact, matched: false });
+                });
+                gameData.cards = shuffle(gameData.cards);
+
+                showScreen("memoryScreen");
+                renderMemoryGrid();
+                $("memoryTimer").textContent = "0:00";
+                gameData.interval = setInterval(() => {
+                    gameData.seconds++;
+                    const m = Math.floor(gameData.seconds / 60);
+                    const s = gameData.seconds % 60;
+                    $("memoryTimer").textContent = `${m}:${s.toString().padStart(2, "0")}`;
+                }, 1000);
+            }
+
+            function renderMemoryGrid() {
+                const grid = $("memoryGrid");
+                grid.innerHTML = "";
+                gameData.cards.forEach((c, i) => {
+                    const card = document.createElement("div");
+                    card.className = "memory-card";
+                    card.dataset.index = i;
+                    card.innerHTML = `
+      <div class="memory-card-front">🌿</div>
+      <div class="memory-card-back">${c.emoji}</div>
+    `;
+                    card.onclick = () => flipCard(i);
+                    grid.appendChild(card);
+                });
+            }
+
+            function flipCard(idx) {
+                if (gameData.locked) return;
+                const card = gameData.cards[idx];
+                if (card.matched) return;
+                const el = document.querySelectorAll(".memory-card")[idx];
+                if (el.classList.contains("flipped")) return;
+
+                el.classList.add("flipped");
+                gameData.flipped.push(idx);
+
+                if (gameData.flipped.length === 2) {
+                    gameData.moves++;
+                    $("memoryMoves").textContent = gameData.moves;
+                    gameData.locked = true;
+                    const [a, b] = gameData.flipped;
+
+                    if (gameData.cards[a].pairId === gameData.cards[b].pairId) {
+                        gameData.cards[a].matched = true;
+                        gameData.cards[b].matched = true;
+                        document.querySelectorAll(".memory-card")[a].classList.add("matched");
+                        document.querySelectorAll(".memory-card")[b].classList.add("matched");
+                        gameData.matched++;
+                        $("memoryPairs").textContent = `${gameData.matched}/${memoryPairs.length}`;
+                        gameData.flipped = [];
+                        gameData.locked = false;
+
+                        if (gameData.matched === memoryPairs.length) {
+                            clearInterval(gameData.interval);
+                            gameData.timeout = setTimeout(() => {
+                                const score = Math.max(100 - gameData.moves * 2, 20);
+                                showResult(
+                                    "memory",
+                                    score,
+                                    100,
+                                    `Selesai dalam ${gameData.moves} langkah dan ${Math.floor(gameData.seconds / 60)}:${(gameData.seconds % 60).toString().padStart(2, "0")} menit!`,
+                                );
+                            }, 800);
+                        }
+                    } else {
+                        gameData.timeout = setTimeout(() => {
+                            document.querySelectorAll(".memory-card")[a].classList.remove("flipped");
+                            document.querySelectorAll(".memory-card")[b].classList.remove("flipped");
+                            gameData.flipped = [];
+                            gameData.locked = false;
+                        }, 800);
+                    }
+                }
+            }
+
+            // ============ GAME 4: TAP CORRECT ============
+            const tapRounds = [
+                {
+                    instruction: 'Tap semua yang <span class="highlight">SEHAT & SEGAR</span>!',
+                    correct: ["🍎", "🥦", "🥕", "🍊", "🥗", "🐟", "🍌", "🥑"],
+                    wrong: ["🍔", "🍟", "🍩", "🧁", "🥤", "🍬"],
+                    needed: 5,
+                },
+                {
+                    instruction: 'Tap yang bisa <span class="highlight">DIKOMPOS</span>!',
+                    correct: ["🍌", "🥚", "🍂", "🥬", "🍎", "🥕", "🍚", "🍌"],
+                    wrong: ["🥫", "🧴", "🔋", "📱", "🪨", "🥤"],
+                    needed: 4,
+                },
+                {
+                    instruction: 'Tap sumber <span class="highlight">PROTEIN</span>!',
+                    correct: ["🐟", "🥚", "🍗", "🥛", "🥜", "🫘"],
+                    wrong: ["🍬", "🧃", "🍩", "🍟", "🍔", "🥤"],
+                    needed: 4,
+                },
+                {
+                    instruction: 'Tap yang bisa <span class="highlight">DIDAUR ULANG</span>!',
+                    correct: ["🫙", "📰", "🥫", "🧴", "📦", "🥤"],
+                    wrong: ["🍌", "🍂", "🥬", "🍗", "🥚", "🍎"],
+                    needed: 4,
+                },
+                {
+                    instruction: 'Tap makanan <span class="highlight">BERGIZI SEIMBANG</span>!',
+                    correct: ["🍚", "🐟", "🥦", "🍎", "🥛", "🥕"],
+                    wrong: ["🍟", "🍩", "🍬", "🥤", "🧁", "🍔"],
+                    needed: 4,
+                },
+            ];
+
+            function initTap() {
+                gameData.round = 0;
+                gameData.score = 0;
+                gameData.lives = 5;
+                gameData.timeLeft = 60;
+                gameData.roundItems = [];
+                gameData.itemsNeeded = 0;
+                gameData.itemsTapped = 0;
+                showScreen("tapScreen");
+                renderTapRound();
+                gameData.interval = setInterval(() => {
+                    gameData.timeLeft--;
+                    $("tapTimer").textContent = gameData.timeLeft;
+                    $("tapTimerBar").style.width = (gameData.timeLeft / 60) * 100 + "%";
+                    if (gameData.timeLeft <= 0) {
+                        clearInterval(gameData.interval);
+                        showResult(
+                            "tap",
+                            gameData.score,
+                            tapRounds.length * 5,
+                            `Skor: ${gameData.score} | Nyawa tersisa: ${gameData.lives}`,
+                        );
+                    }
+                }, 1000);
+            }
+
+            function renderTapRound() {
+                if (gameData.round >= tapRounds.length) {
+                    clearInterval(gameData.interval);
+                    showResult(
+                        "tap",
+                        gameData.score,
+                        tapRounds.length * 5,
+                        `Skor akhir: ${gameData.score} dari ${tapRounds.length * 5}`,
+                    );
+                    return;
+                }
+                const r = tapRounds[gameData.round];
+                $("tapInstruction").innerHTML = r.instruction;
+                $("tapRoundInfo").textContent = `Round ${gameData.round + 1}/${tapRounds.length}`;
+                $("tapScore").textContent = gameData.score;
+                $("tapLives").textContent = "❤️".repeat(gameData.lives);
+
+                gameData.roundItems = [];
+                gameData.itemsTapped = 0;
+                gameData.itemsNeeded = r.needed;
+
+                const allItems = shuffle([...r.correct, ...r.wrong]).slice(0, 9);
+                gameData.roundItems = allItems;
+
+                const grid = $("tapGrid");
+                grid.innerHTML = "";
+                allItems.forEach((emoji, i) => {
+                    const item = document.createElement("div");
+                    item.className = "tap-item";
+                    item.innerHTML = `<div class="emoji">${emoji}</div>`;
+                    item.onclick = () => tapItem(emoji, item, r.correct.includes(emoji));
+                    grid.appendChild(item);
+                });
+            }
+
+            function tapItem(emoji, el, isCorrect) {
+                if (el.classList.contains("disabled")) return;
+                if (isCorrect) {
+                    el.classList.add("correct-tap", "disabled");
+                    gameData.itemsTapped++;
+                    gameData.score++;
+                    $("tapScore").textContent = gameData.score;
+                    if (gameData.itemsTapped >= gameData.itemsNeeded) {
+                        gameData.timeout = setTimeout(() => {
+                            gameData.round++;
+                            renderTapRound();
+                        }, 600);
+                    }
+                } else {
+                    el.classList.add("wrong-tap");
+                    gameData.lives--;
+                    $("tapLives").textContent = "❤️".repeat(Math.max(0, gameData.lives));
+                    if (gameData.lives <= 0) {
+                        clearInterval(gameData.interval);
+                        gameData.timeout = setTimeout(() => {
+                            showResult(
+                                "tap",
+                                gameData.score,
+                                tapRounds.length * 5,
+                                `Nyawa habis! Skor: ${gameData.score}`,
+                            );
+                        }, 500);
+                    }
+                    gameData.timeout = setTimeout(() => el.classList.remove("wrong-tap"), 400);
+                }
+            }
+
+            // ============ GAME 5: WORD SCRAMBLE ============
+            const wordList = [
+                { word: "KOMPOS", emoji: "🌱", hint: "Pupuk alami dari sisa organik" },
+                { word: "GIZI", emoji: "🥗", hint: "Nutrisi yang dibutuhkan tubuh" },
+                { word: "DAUR ULANG", emoji: "♻️", hint: "Mengolah kembali barang bekas" },
+                { word: "SERAT", emoji: "🌾", hint: "Zat dalam sayur & buah untuk pencernaan" },
+                { word: "VITAMIN", emoji: "💊", hint: "Zat penting untuk kesehatan tubuh" },
+                { word: "PROTEIN", emoji: "🥩", hint: "Zat pembangun tubuh" },
+                { word: "SEGAR", emoji: "🧊", hint: "Kondisi makanan yang masih baik" },
+                { word: "ORGANIK", emoji: "🌿", hint: "Bahan alami tanpa bahan kimia" },
+                {
+                    word: "KOMPOT",
+                    emoji: "🍲",
+                    hint: "Cara mengolah buah jadi manisan - bukan, ini SALAH! Jawabannya: cara mengolah sisa makanan jadi pupuk",
+                },
+                { word: "NUTRISI", emoji: "📊", hint: "Zat makanan yang dibutuhkan tubuh" },
+            ];
+
+            function initWord() {
+                gameData.words = shuffle(wordList).slice(0, 10);
+                gameData.index = 0;
+                gameData.score = 0;
+                gameData.selectedLetters = [];
+                gameData.revealed = [];
+                gameData.hintUsed = 0;
+                showScreen("wordScreen");
+                renderWord();
+            }
+
+            function renderWord() {
+                if (gameData.index >= gameData.words.length) {
+                    showResult(
+                        "word",
+                        gameData.score,
+                        gameData.words.length * 2,
+                        `Kamu berhasil menyusun ${gameData.score} kata!`,
+                    );
+                    return;
+                }
+                const w = gameData.words[gameData.index];
+                gameData.selectedLetters = [];
+                gameData.revealed = [];
+                gameData.hintUsed = 0;
+
+                $("wordEmoji").textContent = w.emoji;
+                $("wordHintText").textContent = w.hint;
+                $("wordHint").textContent = "Klik 💡 untuk membuka huruf";
+                $("wordScore").textContent = gameData.score;
+                $("wordProgress").textContent = `${gameData.index + 1}/${gameData.words.length}`;
+                $("wordResult").textContent = "";
+                $("wordResult").className = "sort-result";
+
+                const scrambled = shuffle(w.word.split(""));
+                const slots = $("wordSlots");
+                slots.innerHTML = "";
+                for (let i = 0; i < w.word.length; i++) {
+                    const slot = document.createElement("div");
+                    slot.className = "a-slot";
+                    slot.dataset.pos = i;
+                    slot.onclick = () => removeLetterFromSlot(i);
+                    slots.appendChild(slot);
+                }
+
+                const letters = $("wordLetters");
+                letters.innerHTML = "";
+                scrambled.forEach((ch, i) => {
+                    const btn = document.createElement("div");
+                    btn.className = "s-letter";
+                    btn.textContent = ch;
+                    btn.dataset.char = ch;
+                    btn.dataset.idx = i;
+                    btn.onclick = () => addLetterToSlot(ch, btn);
+                    letters.appendChild(btn);
+                });
+            }
+
+            function addLetterToSlot(ch, btn) {
+                const w = gameData.words[gameData.index];
+                const filledSlots = $("wordSlots").querySelectorAll(".a-slot.filled").length;
+                if (filledSlots >= w.word.length) return;
+
+                btn.classList.add("used");
+                gameData.selectedLetters.push({ ch, btn });
+
+                const slots = $("wordSlots").querySelectorAll(".a-slot");
+                for (let s of slots) {
+                    if (!s.classList.contains("filled")) {
+                        s.textContent = ch;
+                        s.classList.add("filled");
+                        break;
+                    }
+                }
+                checkWordComplete();
+            }
+
+            function removeLetterFromSlot(pos) {
+                const slots = $("wordSlots").querySelectorAll(".a-slot");
+                const slot = slots[pos];
+                if (!slot.classList.contains("filled")) return;
+
+                // Find the last selected letter that matches
+                for (let i = gameData.selectedLetters.length - 1; i >= 0; i--) {
+                    if (gameData.selectedLetters[i].ch === slot.textContent) {
+                        gameData.selectedLetters[i].btn.classList.remove("used");
+                        gameData.selectedLetters.splice(i, 1);
+                        break;
+                    }
+                }
+                slot.textContent = "";
+                slot.classList.remove("filled");
+                $("wordResult").textContent = "";
+                $("wordResult").className = "sort-result";
+            }
+
+            function checkWordComplete() {
+                const w = gameData.words[gameData.index];
+                const slots = $("wordSlots").querySelectorAll(".a-slot");
+                const answer = Array.from(slots)
+                    .map(s => s.textContent)
+                    .join("");
+
+                if (answer.length === w.word.length) {
+                    if (answer === w.word) {
+                        gameData.score += 2;
+                        $("wordResult").textContent = "✅ Benar! Hebat!";
+                        $("wordResult").className = "sort-result correct";
+                        gameData.index++;
+                        gameData.timeout = setTimeout(renderWord, 1200);
+                    } else {
+                        $("wordResult").textContent = "❌ Belum tepat, coba lagi!";
+                        $("wordResult").className = "sort-result wrong";
+                    }
+                }
+            }
+
+            function wordClear() {
+                gameData.selectedLetters.forEach(l => l.btn.classList.remove("used"));
+                gameData.selectedLetters = [];
+                const slots = $("wordSlots").querySelectorAll(".a-slot");
+                slots.forEach(s => {
+                    s.textContent = "";
+                    s.classList.remove("filled");
+                });
+                $("wordResult").textContent = "";
+                $("wordResult").className = "sort-result";
+            }
+
+            function wordRevealLetter() {
+                const w = gameData.words[gameData.index];
+                if (gameData.hintUsed >= 2) return;
+
+                const slots = $("wordSlots").querySelectorAll(".a-slot");
+                let targetPos = -1;
+                for (let i = 0; i < w.word.length; i++) {
+                    if (!slots[i].classList.contains("filled")) {
+                        targetPos = i;
+                        break;
+                    }
+                }
+                if (targetPos === -1) return;
+
+                const targetChar = w.word[targetPos];
+                const letterBtns = $("wordLetters").querySelectorAll(".s-letter:not(.used)");
+                for (let btn of letterBtns) {
+                    if (btn.dataset.char === targetChar) {
+                        btn.classList.add("used");
+                        slots[targetPos].textContent = targetChar;
+                        slots[targetPos].classList.add("filled");
+                        gameData.selectedLetters.push({ ch: targetChar, btn });
+                        gameData.hintUsed++;
+                        $("wordHint").textContent =
+                            gameData.hintUsed >= 2
+                                ? "💡 Petunjuk sudah habis!"
+                                : `💡 Petunjuk tersisa: ${2 - gameData.hintUsed}`;
+                        checkWordComplete();
+                        break;
+                    }
+                }
+            }
+        </script>
+    </body>
+</html>
